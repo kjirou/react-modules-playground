@@ -1,18 +1,43 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css'
 import './App.css';
+
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
+
+        <h2>react-select</h2>
+
+        <h3>Basic</h3>
+        <div style={{width: 200}}>
+          <Select
+            name="rs-foo"
+            value="one"
+            options={
+              [
+                { value: 'one', label: 'One' },
+                { value: 'two', label: 'Two', disabled: true },
+                { value: 'three', label: 'Three' },
+              ]
+            }
+            onChange={
+              (val) => {
+                console.log("onChange: " + JSON.stringify(val));
+              }
+            }
+            // 絞り込みフォームの "One" をクリックしたときのイベントハンドラ
+            onValueClick={
+              (val) => {
+                console.log("onValueClick: " + JSON.stringify(val));
+              }
+            }
+          />
         </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+
       </div>
     );
   }

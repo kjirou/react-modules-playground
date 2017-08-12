@@ -6,6 +6,14 @@ import './App.css';
 
 
 class App extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      selectedValue: 'one',
+    };
+  }
+
   render() {
     return (
       <div className="App">
@@ -16,7 +24,7 @@ class App extends Component {
         <div style={{width: 200}}>
           <Select
             name="rs-foo"
-            value="one"
+            value={this.state.selectedValue}
             options={
               [
                 { value: 'one', label: 'One' },
@@ -25,8 +33,12 @@ class App extends Component {
               ]
             }
             onChange={
-              (val) => {
-                console.log("onChange: " + JSON.stringify(val));
+              (selectedValueOrValues) => {
+                console.log("onChange: " + JSON.stringify(selectedValueOrValues));
+
+                this.setState({
+                  selectedValue: selectedValueOrValues.value,
+                });
               }
             }
             // 絞り込みフォームの "One" をクリックしたときのイベントハンドラ

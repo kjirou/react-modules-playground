@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 
+import filterChangeEventDuringComposition from './lib/filterChangeEventDuringComposition';
+
 import 'react-select/dist/react-select.css'
 import './App.css';
 
@@ -15,6 +17,9 @@ class App extends Component {
   }
 
   render() {
+    const FilteredInput = filterChangeEventDuringComposition('input');
+
+
     return (
       <div className="App">
 
@@ -45,6 +50,18 @@ class App extends Component {
             onValueClick={
               (val) => {
                 console.log("onValueClick: " + JSON.stringify(val));
+              }
+            }
+          />
+        </div>
+
+
+        <h2>HoC test</h2>
+        <div>
+          <FilteredInput
+            onChange={
+              (event) => {
+                console.log('Wrapper:', event.target.value);
               }
             }
           />

@@ -35,6 +35,9 @@ class App extends Component {
                 { value: 'one', label: 'One' },
                 { value: 'two', label: 'Two', disabled: true },
                 { value: 'three', label: 'Three' },
+                { value: 'four', label: 'よん' },
+                { value: 'five', label: 'ご' },
+                { value: 'six', label: 'ろく' },
               ]
             }
             onChange={

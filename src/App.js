@@ -10,6 +10,16 @@ import 'react-select/dist/react-select.css'
 import './App.css';
 
 
+//
+// react-dnd のサンプルついて）
+//
+// 現在は挙動が成立している最小限の実装である。
+// これに＋で欲しい機能は
+// 1) 要素が入るはずのところに Line を出す
+// 2) ドロップ要素の高さ半分より上なら上に、ドロップ要素の高さ半分より下なら下に、入るようにする
+// 3) ドラッグ可能な場所が要素の一部分である場合に preview を使って絞る
+//
+
 const Food = ({foodName}) => {
   return <span>{foodName}</span>
 };

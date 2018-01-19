@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {DragDropContext, DragSource, DropTarget} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import Select from 'react-select';
+import {compose} from 'recompose';
 
 import filterChangeEventDuringComposition from './lib/filterChangeEventDuringComposition';
 
@@ -21,10 +22,10 @@ const FoodRow = ({connectDragSource, connectDropTarget, foodName, isDragging}) =
   );
 };
 
-const DndableFoodRow = [
+const DndableFoodRow = compose(
   DragSource(
     'Food',
-    // Drag Source Specification
+    // Drag Source Specification (spec)
     // http://react-dnd.github.io/react-dnd/docs-drag-source.html#drag-source-specification
     {
       // ドラッグ直後に実行される
@@ -32,7 +33,8 @@ const DndableFoodRow = [
       // 描画時の props から、「ドラッグ中のこの要素の props」を定義する。
       // 例えば、monitor.getItem() などで取得できる値である。
       //
-      // 引数の props に connectDropTarget が入っている仕組みが謎。今は些細なので無視。
+      // この前に DropTarget でコンポーネントをフィルタしている場合は、
+      // props にそのプロパティも含まれている。
       beginDrag: (props) => {
         console.log('DragSource::spec::beginDrag(props)', props);
 
@@ -53,6 +55,7 @@ const DndableFoodRow = [
         });
       }
     },
+    // (collect)
     (connect, monitor) => {
       return {
         connectDragSource: connect.dragSource(),
@@ -74,8 +77,8 @@ const DndableFoodRow = [
         connectDropTarget: connect.dropTarget(),
       };
     }
-  ),
-].reduce((m, fn) => fn(m), FoodRow);
+  )
+)(FoodRow);
 
 class DndSection_ extends Component {
   constructor() {

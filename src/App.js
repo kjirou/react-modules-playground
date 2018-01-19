@@ -27,7 +27,7 @@ const FoodRow = (props) => {
   const styles = {
     marginTop: 3,
     width: 200,
-    backgroundColor: 'yellow',
+    backgroundColor: isDragging ? 'green' : 'lime',
   };
   if (showTopLine) {
     styles.borderTop = '5px solid blue';

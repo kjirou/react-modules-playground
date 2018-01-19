@@ -13,7 +13,7 @@ const Food = ({foodName}) => {
   return <span>{foodName}</span>
 };
 
-const FoodRow = ({connectDragSource, connectDropTarget, foodName}) => {
+const FoodRow = ({connectDragSource, connectDropTarget, foodName, isDragging}) => {
   return connectDropTarget(
     connectDragSource(
       <li><Food foodName={foodName} /></li>
@@ -24,22 +24,39 @@ const FoodRow = ({connectDragSource, connectDropTarget, foodName}) => {
 const DndableFoodRow = [
   DragSource(
     'Food',
+    // Drag Source Specification
+    // http://react-dnd.github.io/react-dnd/docs-drag-source.html#drag-source-specification
     {
+      // ドラッグ直後に実行される
+      //
+      // 描画時の props から、「ドラッグ中のこの要素の props」を定義する。
+      // 例えば、monitor.getItem() などで取得できる値である。
+      //
+      // 引数の props に connectDropTarget が入っている仕組みが謎。今は些細なので無視。
       beginDrag: (props) => {
-       return {
-         foodName: props.foodName,
-       };
+        console.log('DragSource::spec::beginDrag(props)', props);
+
+        return {
+          _beginDragComment: 'beginDragを通った',
+          foodName: props.foodName,
+        };
       },
+      // ドラッグ終了直後に実行される
+      //
+      // 第一引数の props は beginDrag と同じっぽい、つまり描画時の props 。
       endDrag: (props, monitor, component) => {
-       if (!monitor.didDrop()) {
-         return;
-       }
-       console.log(monitor.getDropResult(), monitor.getItem());
+        console.log('DragSource::spec::endDrag(props, monitor, component)', props, monitor, component, {
+          // Droppable な場所にドロップされたら true、それ以外は false
+          'monitor.didDrop()': monitor.didDrop(),
+          // beginDrag でフィルタされたプロパティ群を返す
+          'monitor.getItem()': monitor.getItem(),
+        });
       }
     },
     (connect, monitor) => {
       return {
         connectDragSource: connect.dragSource(),
+        isDragging: monitor.isDragging(),
       };
     }
   ),

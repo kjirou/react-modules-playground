@@ -20,8 +20,8 @@ const FoodRow = (props) => {
     connectDropTarget,
     foodName,
     isDragging,
-    showTopLine = false,
     showBottomLine = false,
+    showTopLine = false,
   } = props;
 
   const styles = {
@@ -72,9 +72,15 @@ const DndableFoodRow = compose(
         console.log('DragSource::spec::endDrag(props, monitor, component)', props, monitor, component, {
           // Droppable な場所にドロップされたら true、それ以外は false
           'monitor.didDrop()': monitor.didDrop(),
+          // DropTarget::spec::drop で返している値がとれる、なお drop だと null
+          'monitor.getDropResult()': monitor.getDropResult(),
           // beginDrag でフィルタされたプロパティ群を返す
           'monitor.getItem()': monitor.getItem(),
         });
+
+        // 他の FoodRow の上でないところにドロップしたら一番下に入るようにする
+        const toFoodName = monitor.didDrop() ? monitor.getDropResult().foodName : null;
+        props.onEndDrag(props.foodName, toFoodName);
       }
     },
     // collect 引数
@@ -89,12 +95,18 @@ const DndableFoodRow = compose(
     'Food',
     // spec 引数
     {
+      // DragSource::spec::endDrag より先に発火し、そこで使うための monitor.getDropResult() を設定できる
+      // 他にも仕事があるのかもだけどわからない
       drop(props, monitor, component) {
-        console.log('DropTarget::spec::drop(props, monitor, component)', props, monitor, component);
+        console.log('DropTarget::spec::drop(props, monitor, component)', props, monitor, component, {
+          // null になってる、なお endDrag だと値がある
+          'monitor.getDropResult()': monitor.getDropResult(),
+          'monitor.getItem()': monitor.getItem(),
+        });
 
         return {
-          targetProps: props,
           _dropComment: 'dropを通った',
+          foodName: props.foodName,
         };
       },
       hover(props, monitor, component) {
@@ -113,17 +125,45 @@ const DndableFoodRow = compose(
 class DndSection_ extends Component {
   constructor() {
     super();
+
     this.state = {
       foodNames: ['Apple', 'Orange', 'Grape'],
     };
   }
 
+  // destinationFoodName = moverFoodName がその位置に入り、もともとの foodName は一つ下がる
+  //                       null の場合は末尾に入る
+  _sortFoods(moverFoodName, destinationFoodName) {
+    const moverFoodNameIndex = this.state.foodNames.indexOf(moverFoodName);
+    let destinationFoodNameIndex = this.state.foodNames.indexOf(destinationFoodName);
+    if (destinationFoodNameIndex === -1) {
+      destinationFoodNameIndex = this.state.foodNames.length;
+    }
+
+    const newFoodNames = this.state.foodNames.slice();
+    if (destinationFoodNameIndex < moverFoodNameIndex) {
+      newFoodNames.splice(moverFoodNameIndex, 1);
+      newFoodNames.splice(destinationFoodNameIndex, 0, moverFoodName);
+    } else if (destinationFoodNameIndex > moverFoodNameIndex) {
+      newFoodNames.splice(destinationFoodNameIndex, 0, moverFoodName);
+      newFoodNames.splice(moverFoodNameIndex, 1);
+    }
+
+    this.setState({
+      foodNames: newFoodNames,
+    });
+  }
+
   render() {
+    const onEndDrag = (fromFoodName, toFoodName) => {
+      this._sortFoods(fromFoodName, toFoodName);
+    };
+
     return (
       <ul>
       {
         this.state.foodNames.map((foodName, index) => {
-          return <DndableFoodRow key={index} foodName={foodName} />;
+          return <DndableFoodRow key={index} foodName={foodName} onEndDrag={onEndDrag} />;
         })
       }
       </ul>

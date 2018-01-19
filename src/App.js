@@ -14,10 +14,31 @@ const Food = ({foodName}) => {
   return <span>{foodName}</span>
 };
 
-const FoodRow = ({connectDragSource, connectDropTarget, foodName, isDragging}) => {
+const FoodRow = (props) => {
+  const {
+    connectDragSource,
+    connectDropTarget,
+    foodName,
+    isDragging,
+    showTopLine = false,
+    showBottomLine = false,
+  } = props;
+
+  const styles = {
+    marginTop: 3,
+    width: 200,
+    backgroundColor: 'yellow',
+  };
+  if (showTopLine) {
+    styles.borderTop = '5px solid blue';
+  }
+  if (showBottomLine) {
+    styles.borderBottom = '5px solid blue';
+  }
+
   return connectDropTarget(
     connectDragSource(
-      <li><Food foodName={foodName} /></li>
+      <li style={styles}><Food foodName={foodName} /></li>
     )
   );
 };
@@ -25,7 +46,8 @@ const FoodRow = ({connectDragSource, connectDropTarget, foodName, isDragging}) =
 const DndableFoodRow = compose(
   DragSource(
     'Food',
-    // Drag Source Specification (spec)
+    // spec 引数
+    // Drag Source Specification
     // http://react-dnd.github.io/react-dnd/docs-drag-source.html#drag-source-specification
     {
       // ドラッグ直後に実行される
@@ -55,7 +77,7 @@ const DndableFoodRow = compose(
         });
       }
     },
-    // (collect)
+    // collect 引数
     (connect, monitor) => {
       return {
         connectDragSource: connect.dragSource(),
@@ -65,13 +87,21 @@ const DndableFoodRow = compose(
   ),
   DropTarget(
     'Food',
+    // spec 引数
     {
       drop(props, monitor, component) {
+        console.log('DropTarget::spec::drop(props, monitor, component)', props, monitor, component);
+
         return {
           targetProps: props,
+          _dropComment: 'dropを通った',
         };
       },
+      hover(props, monitor, component) {
+        console.log('DropTarget::spec::hover(props, monitor, component)', props, monitor, component);
+      },
     },
+    // collect 引数
     (connect, monitor) => {
       return {
         connectDropTarget: connect.dropTarget(),
